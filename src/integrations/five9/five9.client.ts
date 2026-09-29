@@ -7,6 +7,7 @@ import { ConfigService } from "@nestjs/config";
 @Injectable()
 export class Five9Client {
 
+    private readonly baseUrl: string = 'https://api.prod.us.five9.net'
     private token: string | null = null;
     private chatId: string | null = null;
     private domainId: string | null = null;
@@ -16,14 +17,15 @@ export class Five9Client {
     ){}
     
     async getBearerToken() {
-        const url = 'https://api.prod.us.five9.net/oauth2/v1/token';
-        const username = this.configService.get<string>('CONSUMER_KEY');
-        const password = this.configService.get<string>('SECRET_ID');
+        const url = `${this.baseUrl}/oauth2/v1/token`;
+        const username = this.configService.get<string>('FIVE9_CONSUMER_KEY');
+        const password = this.configService.get<string>('FIVE9_SECRET_ID');
         this.logger.log(`Consumer Key: ${username}\nSecret ID: ${password}`);
         const credentials = Buffer.from(`${username}:${password}`).toString('base64');
         const body = new URLSearchParams({
             grant_type: 'client_credentials',
-            scope: 'read',
+            scope: 'openmessaging:read openmessaging:write', // The scope name "openmessaging" can be retrieved from a valid token's payload by decoding the base64 middle section.
+                                                             // You can get a valid token from a successful request sent using Postman. I couldn't find the scope name in the docs.
         });
 
         try {
@@ -35,10 +37,13 @@ export class Five9Client {
                 },
                 body,
             });
-    
             const data = await response.json();
+            if (!response.ok) {
+                throw new Error(`Five9 API returned status ${response.status}: ${JSON.stringify(data)}`);
+            }
             this.logger.log(`New token created. Expires in ${data.expires_in} seconds`);
             this.token = data.access_token;
+            return;
         } catch (error) {
             this.logger.warn(`Failed to retrieve token. Check your Five9 environment variables. (CONSUMER_KEY and SECRET_ID)\n${error}`);
         }
@@ -46,7 +51,7 @@ export class Five9Client {
 
     async createNewChat(domainId: string, deliveryProfileId: string, phoneNumber: string) {
         this.domainId = domainId;
-        const url = `https://api.prod.us.five9.net/messaging-service/v1/domains/${domainId}/delivery-profiles/${deliveryProfileId}/chats`
+        const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/delivery-profiles/${deliveryProfileId}/chats`
         const body = {
             "channel": "GENERIC",
             "campaignSource": {
@@ -55,7 +60,7 @@ export class Five9Client {
                 "campaignHandle": "Chat"
             },
             "contactSource": {
-                "clientHandle": phoneNumber
+                "clientHandle": `${phoneNumber}`
             },
             "attributes": [
                 {
@@ -75,16 +80,19 @@ export class Five9Client {
                 body: JSON.stringify(body)
             });
             const data = await response.json();
-            this.logger.log(`New chat created\n\n${data}`);
+            if (!response.ok) {
+                throw new Error(`Five9 API returned status ${response.status}: ${JSON.stringify(data)}`);
+            }
+            this.logger.log(`New chat created\n\n${JSON.stringify(data)}`);
             this.chatId = data.chatId;
+            return;
         } catch (error) {
             this.logger.warn(`Failed to create a new chat.\n${error}`);
         }
-        
     }
 
     async sendMessage(text: string) {
-        const url = `https://api.prod.us.five9.net/messaging-service/v1/domains/${this.domainId}/chats/${this.chatId}/messages`;
+        const url = `${this.baseUrl}/messaging-service/v1/domains/${this.domainId}/chats/${this.chatId}/messages`;
         const body = {
             "type": "RICHTEXT",
             "timestamp": new Date().toISOString(), // Current UTC time

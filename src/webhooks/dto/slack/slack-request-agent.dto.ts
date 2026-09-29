@@ -3,4 +3,5 @@ export class SlackRequestAgentDTO {
     domainId: string;
     deliveryProfileId: string;
     phoneNumber: string;
+    userId: string;
 }

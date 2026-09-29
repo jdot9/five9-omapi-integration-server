@@ -12,8 +12,8 @@ export class Five9Service {
 
     async requestAgent(domaindId: string, deliveryProfileId: string, phoneNumber: string) {
         this.logger.log('Processing request for Five9 agent...');
-        this.five9Client.getBearerToken();
-        this.five9Client.createNewChat(domaindId, deliveryProfileId, phoneNumber);
+        await this.five9Client.getBearerToken();
+        await this.five9Client.createNewChat(domaindId, deliveryProfileId, phoneNumber);
     }
     
 }

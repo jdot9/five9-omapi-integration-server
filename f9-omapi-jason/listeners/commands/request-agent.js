@@ -17,12 +17,13 @@ const requestAgentCallback = async ({ ack, respond, logger, command }) => {
         await respond('Failed to process request. Please enter a Domain ID, Delivery Profile ID and phone number in the following format. (Ex. +19119119111');
         return;
     }
-    
+  
     const data = {
         app: 'slack',
         domainId: ids[0],
         deliveryProfileId: ids[1],
-        phoneNumber: ids[2]
+        phoneNumber: ids[2],
+        userId: command.user_id
     };
     // Send POST request to backend 
     const response = await fetch(`${process.env.WEBHOOK_URL}/webhooks/slack`, {
