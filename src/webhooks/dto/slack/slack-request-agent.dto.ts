@@ -1,7 +1,7 @@
 export class SlackRequestAgentDTO {
     app: string
-    domainId: string;
-    deliveryProfileId: string;
+    firstName: string;
+    lastName: string;
     phoneNumber: string;
     userId: string;
 }

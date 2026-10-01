@@ -9,7 +9,7 @@ export class WebhookController {
     private slackUserId: string;
     private slackChannelId: string;
     private slackChannelIds: string[] = [];
-    // Maybe create an array of objects containing slackUserId and privateSlackChannel
+    // Maybe create an array of objects containing slackUserId and privateSlackChannel?
   
     constructor(private readonly five9Service: Five9Service,
                 private readonly slackService: SlackService,
@@ -17,29 +17,33 @@ export class WebhookController {
     ) {}
 
   @Post('slack')
-  async handleSlackRequestAgentEvent(@Body() payload: SlackRequestAgentDTO ) {
+  async handleSlackRequestAgentEvent(@Body() request: SlackRequestAgentDTO ) {
     this.logger.log("Slack request-agent command triggered.");
-    this.slackUserId = payload.userId;
-    await this.five9Service.requestAgent(payload.domainId, payload.deliveryProfileId, payload.phoneNumber, payload.userId);
+    this.slackUserId = request.userId;
+    await this.five9Service.requestAgent(request.firstName, request.lastName, request.phoneNumber, request.userId);
   }
   
 
   @Post('five9')
-  async handleFive9DeliveryProfileEvent(@Body() payload: any){
-    switch (payload.eventType) {
+  async handleFive9DeliveryProfileEvent(@Body() request: any){
+    switch (request.eventType) {
       case 'ACCEPT':
-        this.logger.log(`Five9 agent ${payload.payload.displayName} accepted your request.`);
+        this.logger.log(`Five9 agent ${request.payload.displayName} accepted your request.`);
         this.slackChannelId = await this.slackService.createPrivateSlackChannel(this.slackUserId); // This must return the slack channel id and be saved in memory
         break;
       case 'CREATE':
         this.logger.log("Request for Five9 agent delivered. Awaiting agent to accept chat interaction.");
         break;
-      case 'ERROR':
-        this.logger.log("Failed to deliver chat request to Five9.");
-        break;
       case 'MESSAGE':
         this.logger.log("Message notification triggered.");
-        this.slackService.sendMessage(this.slackChannelId, payload.payload.text); // Route message to slack channel
+        this.slackService.sendMessage(this.slackChannelId, request.payload.text, request.payload.displayName); // Route message to slack channel, pass agent's name
+        break;
+      case 'TERMINATE':
+        this.logger.log(`Chat closed. (agent has left channel ${this.slackChannelId})`);
+        this.slackService.sendMessage(this.slackChannelId, 'Chat closed.\nYour assigned Agent has left the channel.');
+        break;
+      case 'ERROR':
+        this.logger.log("Failed to deliver chat request to Five9.");
         break;
   }
 }

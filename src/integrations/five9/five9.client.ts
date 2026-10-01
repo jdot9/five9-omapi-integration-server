@@ -10,7 +10,6 @@ export class Five9Client {
     private readonly baseUrl: string = 'https://api.prod.us.five9.net'
     private token: string | null = null;
     private chatId: string | null = null;
-    private domainId: string | null = null;
 
     constructor(private readonly configService: ConfigService,
                 private readonly logger: Logger,
@@ -49,23 +48,28 @@ export class Five9Client {
         }
     }
 
-    async createNewChat(domainId: string, deliveryProfileId: string, phoneNumber: string, slackUserId: string) {
-        this.domainId = domainId;
-        const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/delivery-profiles/${deliveryProfileId}/chats`
+    async createNewChat(firstName: string, lastName: string, phoneNumber: string, slackUserId: string) {
+        const domainId = this.configService.getOrThrow<string>('FIVE9_DOMAIN_ID');
+        const deliveryProfileId = this.configService.getOrThrow<string>('FIVE9_DELIVERY_PROFILE_ID');
+        const campaignName = this.configService.getOrThrow<string>('FIVE9_CAMPAIGN_NAME');
+        const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/delivery-profiles/${deliveryProfileId}/chats`;
         const body = {
             "channel": "GENERIC",
             "campaignSource": {
-                "campaignId": "411",
-                "campaignName": "zzJasonTestChat", // Replace with environment variable
+                "campaignName": campaignName,
                 "campaignHandle": "Chat"
             },
             "contactSource": {
-                "clientHandle": `${phoneNumber}`
+                "clientHandle": `${firstName} ${lastName}`
             },
             "attributes": [
                 {
                     "attributeName": "slackUserId",
                     "attributeValue": `${slackUserId}`
+                },
+                {
+                    "attributeName": "phoneNumber",
+                    "attributeValue": `${phoneNumber}`
                 }
             ]
         }
@@ -92,7 +96,8 @@ export class Five9Client {
     }
 
     async sendMessage(text: string) {
-        const url = `${this.baseUrl}/messaging-service/v1/domains/${this.domainId}/chats/${this.chatId}/messages`;
+        const domainId = this.configService.getOrThrow<string>('FIVE9_DOMAIN_ID');
+        const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/chats/${this.chatId}/messages`;
         const body = {
             "type": "RICHTEXT",
             "timestamp": new Date().toISOString(), // Current UTC time

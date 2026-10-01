@@ -27,12 +27,15 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
             // If not message, ignore
             if ('subtype' in event && event.subtype || !event.text) {
                 return;
+            } else if(event.text == '$disconnect') {
+           //     this.five9Client.disconnect(chatId);
+                await say('You have ended the conversation.');
+                this.logger.log('You have ended chat interaction with Five9 agent. (Slack)');
+                return;
             }
 
             this.logger.log(`Received Slack message: ${event.text}`);
-            // Send message to Five9
-            this.five9Client.sendMessage(event.text);
-            //await say('Message received by NestJS!');
+            this.five9Client.sendMessage(event.text); // Send message to Five9
 
         })
 
@@ -56,9 +59,9 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
         return channelId;
     }
 
-    async sendMessage(channelId: string, message: string) {
+    async sendMessage(channelId: string, message: string, displayName?: string) {
         this.logger.log(`Routing message from Five9 agent to channel ${channelId}`);
-        this.slackClient.sendMessage(channelId, message);
+        this.slackClient.sendMessage(channelId, message, displayName);
     }
 
 }

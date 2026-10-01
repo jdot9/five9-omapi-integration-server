@@ -14,14 +14,14 @@ const requestAgentCallback = async ({ ack, respond, logger, command }) => {
     
     if (ids.length < 3 || !isValidPhoneNumber)
     {
-        await respond('Failed to process request. Please enter a Domain ID, Delivery Profile ID and phone number in the following format. (Ex. +19119119111');
+        await respond('Failed to process request. Please enter your first name, last name and phone number.\nEx. /request-agent Jason, Dotson, +19119119111');
         return;
     }
   
     const data = {
         app: 'slack',
-        domainId: ids[0],
-        deliveryProfileId: ids[1],
+        firstName: ids[0],
+        lastName: ids[1],
         phoneNumber: ids[2],
         userId: command.user_id
     };

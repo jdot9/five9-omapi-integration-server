@@ -10,14 +10,13 @@ import { randomUUID } from "crypto";
 export class SlackClient {
         private readonly baseUrl = 'https://slack.com/api';
         private channelId: string;
-        private userId: string;
+
 
         constructor(private readonly configService: ConfigService,
                     private readonly logger: Logger,
         ){}
 
         async createConversation(userId: string) {
-            this.userId = userId;
             this.channelId = randomUUID();
             const body = {
                 "name": `five9-agent-${this.channelId}`,
@@ -72,11 +71,14 @@ export class SlackClient {
             }
         }
 
-        async sendMessage(channelId: string, message: string) {
-
+        async sendMessage(channelId: string, message: string, displayName?: string) {
+            const agentEmoji = ':technologist:'; 
+            const botEmoji = ':robot_face:';
             const body = {
                 "channel": channelId,
                 "text": message,
+                "username": `${displayName ?? 'BOT'}`,
+                "icon_emoji": `${displayName ? agentEmoji : botEmoji}`,
             }
 
             try {
