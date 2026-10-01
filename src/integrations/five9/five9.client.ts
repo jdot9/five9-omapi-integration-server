@@ -126,4 +126,33 @@ export class Five9Client {
         }
     }
 
+    async terminateChat(slackUserId: string): Promise<string> {
+        const domainId = this.configService.getOrThrow<string>('FIVE9_DOMAIN_ID');
+        const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/chats/${this.chatId}:terminate`;
+        const body = {
+            "sourceParticipantId": slackUserId,
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body)
+            });
+
+            if (!response.status) {
+                throw new Error(`Five9 API (terminate chat) returned status ${response.status}`);
+            }
+            this.logger.log('Terminate chat success.');
+            return 'success';
+        } catch (error) {
+            this.logger.warn(`Failed to end chat.`);
+            return 'failed';
+        }
+
+    }
+
 }

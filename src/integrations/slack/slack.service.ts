@@ -27,10 +27,15 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
             // If not message, ignore
             if ('subtype' in event && event.subtype || !event.text) {
                 return;
-            } else if(event.text == '$disconnect') {
-           //     this.five9Client.disconnect(chatId);
-                await say('You have ended the conversation.');
-                this.logger.log('You have ended chat interaction with Five9 agent. (Slack)');
+            } else if(event.text == '$quit') { // $disconnect is ignored for some reason
+                const result = await this.five9Client.terminateChat(event.user);
+                if (result == 'success') {
+                    await say('You have ended the conversation.');
+                    this.logger.log('You have ended chat interaction with Five9 agent. (Slack)');
+                } else {
+                    await say('Failed to disconnect.');
+                    this.logger.warn(`Failed to disconnect (Slack)`);
+                }
                 return;
             }
 
