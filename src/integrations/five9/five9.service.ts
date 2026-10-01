@@ -10,10 +10,10 @@ export class Five9Service {
                 private readonly logger: Logger
     ) {}
 
-    async requestAgent(domaindId: string, deliveryProfileId: string, phoneNumber: string) {
+    async requestAgent(domaindId: string, deliveryProfileId: string, phoneNumber: string, slackUserId: string) {
         this.logger.log('Processing request for Five9 agent...');
         await this.five9Client.getBearerToken();
-        await this.five9Client.createNewChat(domaindId, deliveryProfileId, phoneNumber);
+        await this.five9Client.createNewChat(domaindId, deliveryProfileId, phoneNumber, slackUserId);
     }
     
 }

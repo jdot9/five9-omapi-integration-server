@@ -42,6 +42,7 @@ export class SlackClient {
                 const creatorId = data.channel.creator;
                 this.logger.log(`Channel (${channelId}) created by slack bot ${creatorId}.`)
                 this.inviteUserToConversation(channelId, userId);
+                return channelId;
             } catch (error) {
                 this.logger.warn('Failed to create conversation.');
             }
@@ -65,9 +66,35 @@ export class SlackClient {
                 if (!response.ok || data.error == "cant_invite_self") {
                     throw new Error(`Slack Conversations API returned status ${response.status}: ${JSON.stringify(data)}`);
                 }
-                this.logger.log(`Invite sent to user ${userId} (creator)`)
+                this.logger.log(`Invite sent to user ${userId} (creator)`);
             } catch (error) {
                 this.logger.warn(`Failed to invite user ${userId} (creator) to channel ${channelId}`)
+            }
+        }
+
+        async sendMessage(channelId: string, message: string) {
+
+            const body = {
+                "channel": channelId,
+                "text": message,
+            }
+
+            try {
+                const response = await fetch(`${this.baseUrl}/chat.postMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.configService.get<string>('SLACK_BOT_TOKEN')}`,
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(body)
+                })
+                const data = await response.json();
+                if(!response.ok) {
+                    throw new Error(`Slack Chat API returned status ${response.status}: ${JSON.stringify(data)}`);
+                }
+                this.logger.log(`Message routed to channel ${channelId}`);
+            } catch (error) {
+                this.logger.warn(`Failed to route message to channel ${channelId}`);
             }
         }
 }

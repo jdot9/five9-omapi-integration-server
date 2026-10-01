@@ -49,14 +49,14 @@ export class Five9Client {
         }
     }
 
-    async createNewChat(domainId: string, deliveryProfileId: string, phoneNumber: string) {
+    async createNewChat(domainId: string, deliveryProfileId: string, phoneNumber: string, slackUserId: string) {
         this.domainId = domainId;
         const url = `${this.baseUrl}/messaging-service/v1/domains/${domainId}/delivery-profiles/${deliveryProfileId}/chats`
         const body = {
             "channel": "GENERIC",
             "campaignSource": {
                 "campaignId": "411",
-                "campaignName": "zzJasonTestChat",
+                "campaignName": "zzJasonTestChat", // Replace with environment variable
                 "campaignHandle": "Chat"
             },
             "contactSource": {
@@ -64,8 +64,8 @@ export class Five9Client {
             },
             "attributes": [
                 {
-                    "attributeName": "Subject",
-                    "attributeValue": "Open Messaging API"
+                    "attributeName": "slackUserId",
+                    "attributeValue": `${slackUserId}`
                 }
             ]
         }
@@ -108,6 +108,9 @@ export class Five9Client {
                 body: JSON.stringify(body)
             })
             const data = await response.json();
+            if (!response.ok) {
+                throw new Error(`Five9 API (send message) returned status ${response.status}: ${JSON.stringify(data)}`);
+            }
             if (data.status == 'RECEIVED'){
                 this.logger.log("Message delivered.");
             } else {

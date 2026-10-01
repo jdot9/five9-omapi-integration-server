@@ -26,7 +26,8 @@ const requestAgentCallback = async ({ ack, respond, logger, command }) => {
         userId: command.user_id
     };
     // Send POST request to backend 
-    const response = await fetch(`${process.env.WEBHOOK_URL}/webhooks/slack`, {
+    const response = 
+    await fetch(`${process.env.WEBHOOK_URL}/webhooks/slack`, {
         headers: {
             'Content-Type': 'application/json'
         },
@@ -34,7 +35,7 @@ const requestAgentCallback = async ({ ack, respond, logger, command }) => {
         body: JSON.stringify(data)
     });
     const text = await response.text();
-    await respond('Request for Five9 Agent sent. ' + text);
+    await respond('Request for Five9 Agent sent. ');
   } catch (error) {
     logger.error(error);
   }
