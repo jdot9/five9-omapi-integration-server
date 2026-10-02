@@ -65,7 +65,6 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
     }
    
 
-
     async createPrivateSlackChannel(userId: string) {
         this.logger.log(`Processing Five9 ACCEPT webhook event. Creating private slack channel.`);
         const channelId = await this.slackClient.createConversation(userId);
