@@ -8,7 +8,6 @@ export class WebhookController {
 
     private slackUserId: string;
     private slackChannelId: string;
-    private slackChannelIds: string[] = [];
     // Maybe create an array of objects containing slackUserId and privateSlackChannel?
   
     constructor(private readonly five9Service: Five9Service,

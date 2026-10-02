@@ -24,12 +24,13 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
         });
 
         // Register event listeners
+        // 2 Slack apps were needed to get around the round robin silent fail problem. (Problem resolved)
         this.slackApp.event('message', async ({event, say}) => {
             // If not message, ignore
             if ('subtype' in event && event.subtype || !event.text) {
                 this.logger.debug(`Ignoring Slack event (subtype=${'subtype' in event ? event.subtype : undefined}, text=${'text' in event ? event.text : undefined})`);
                 return;
-            } else if(event.text == '$quit') { // $disconnect is ignored for some reason
+            } else if(event.text == '$disconnect') { 
                 const result = await this.five9Client.terminateChat(event.user);
                 if (result == 'success') {
                     await say('You have ended the conversation.');

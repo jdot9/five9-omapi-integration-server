@@ -1,6 +1,6 @@
 {
   "display_information": {
-    "name": "f9-omapi-jason"
+    "name": "f9-omapi-jason2 (local)"
   },
   "features": {
     "app_home": {
@@ -9,7 +9,7 @@
       "messages_tab_read_only_enabled": true
     },
     "bot_user": {
-      "display_name": "f9-omapi-jason",
+      "display_name": "f9-omapi-jason2 (local)",
       "always_online": true
     },
     "shortcuts": [
@@ -25,15 +25,28 @@
         "command": "/sample-command",
         "description": "Runs a sample command",
         "should_escape": false
+      },
+      {
+        "command": "/request-agent",
+        "description": "Requests Five9 agent.",
+        "should_escape": false,
+        "usage_hint": "[firstName, lastName, phoneNumber]"
       }
     ]
   },
   "oauth_config": {
     "scopes": {
       "bot": [
+        "chat:write.customize",
         "channels:history",
         "chat:write",
-        "commands"
+        "commands",
+        "groups:history",
+        "groups:read",
+        "groups:write",
+        "groups:write.invites",
+        "users:read",
+        "users:read.email"
       ]
     }
   },
@@ -49,6 +62,7 @@
         "message.channels"
       ]
     },
-    "token_rotation_enabled": false
+    "token_rotation_enabled": false,
+    "is_mcp_enabled": false
   }
 }

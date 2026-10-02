@@ -1,5 +1,5 @@
 {
-  "name": "f9-omapi-jason",
+  "name": "f9-omapi-jason2",
   "version": "1.0.0",
   "description": "A scaffold template for Slack apps",
   "type": "module",
@@ -26,11 +26,11 @@
     "url": "https://github.com/slack-samples/bolt-js-starter-template/issues"
   },
   "dependencies": {
-    "@slack/bolt": "^5.0.0",
+    "@slack/bolt": "^5.1.0",
     "dotenv": "~17.4.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.11",
+    "@biomejs/biome": "^2.5.14",
     "@slack/cli-hooks": "^2.0.0"
   }
 }
