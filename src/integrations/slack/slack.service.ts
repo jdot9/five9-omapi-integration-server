@@ -3,6 +3,7 @@ import { SlackClient } from "./slack.client.js";
 import { ConfigService } from "@nestjs/config";
 import { App } from "@slack/bolt";
 import { Five9Client } from "../five9/five9.client.js";
+import { emojify } from "node-emoji";
 
 
 @Injectable()
@@ -26,6 +27,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
         this.slackApp.event('message', async ({event, say}) => {
             // If not message, ignore
             if ('subtype' in event && event.subtype || !event.text) {
+                this.logger.debug(`Ignoring Slack event (subtype=${'subtype' in event ? event.subtype : undefined}, text=${'text' in event ? event.text : undefined})`);
                 return;
             } else if(event.text == '$quit') { // $disconnect is ignored for some reason
                 const result = await this.five9Client.terminateChat(event.user);
@@ -40,9 +42,14 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
             }
 
             this.logger.log(`Received Slack message: ${event.text}`);
-            this.five9Client.sendMessage(event.text); // Send message to Five9
+            await this.five9Client.sendMessage(emojify(event.text)); // Convert :shortcode: to unicode before sending to Five9
 
         })
+
+        // Surface errors Bolt would otherwise swallow in its own default handler
+        this.slackApp.error(async (error) => {
+            this.logger.error(`Bolt app error: ${error}`);
+        });
 
         // Establish socket mode connection
         await this.slackApp.start();

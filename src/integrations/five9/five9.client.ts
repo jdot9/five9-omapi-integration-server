@@ -108,7 +108,7 @@ export class Five9Client {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${this.token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json; charset=utf-8'
                 },
                 body: JSON.stringify(body)
             })

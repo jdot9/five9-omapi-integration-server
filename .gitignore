@@ -59,4 +59,5 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 # Environment variables
-.env
+.env*
+!.env.sample
