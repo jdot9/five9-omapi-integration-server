@@ -73,7 +73,7 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
 
     async sendMessage(channelId: string, message: string, displayName?: string) {
         this.logger.log(`Routing message from Five9 agent to channel ${channelId}`);
-        this.slackClient.sendMessage(channelId, message, displayName);
+        this.slackClient.sendMessage(channelId, message.replace(/\\!/g, '!'), displayName); // Five9's RICHTEXT content escapes "!" as "\!"; undo that before posting to Slack
     }
 
     async showTypingIndicator(channelId: string): Promise<string | undefined> {

@@ -3,7 +3,7 @@ dotenv.config()
 // slash-command parameters are available through the command.text property
 const requestAgentCallback = async ({ ack, respond, logger, command }) => {
   try {
-    await ack("Request received.");
+    await ack("Request sent.");
     // Parse user_id
     const phoneRegex = /^\+[1-9]\d{7,14}$/;
     const message = command.text; // Removes all spaces
@@ -35,7 +35,7 @@ const requestAgentCallback = async ({ ack, respond, logger, command }) => {
         body: JSON.stringify(data)
     });
     const text = await response.text();
-    await respond('Request for Five9 Agent sent. ');
+    await respond('An agent will be with you shortly.');
   } catch (error) {
     logger.error(error);
   }
