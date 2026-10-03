@@ -76,4 +76,12 @@ export class SlackService implements OnModuleInit, OnModuleDestroy{
         this.slackClient.sendMessage(channelId, message, displayName);
     }
 
+    async showTypingIndicator(channelId: string): Promise<string | undefined> {
+        return this.slackClient.sendTypingIndicator(channelId);
+    }
+
+    async clearTypingIndicator(channelId: string, ts: string): Promise<void> {
+        await this.slackClient.clearTypingIndicator(channelId, ts);
+    }
+
 }

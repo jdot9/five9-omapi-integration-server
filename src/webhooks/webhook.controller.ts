@@ -8,6 +8,7 @@ export class WebhookController {
 
     private slackUserId: string;
     private slackChannelId: string;
+    private typingMessageTs: string | undefined;
     // Maybe create an array of objects containing slackUserId and privateSlackChannel?
   
     constructor(private readonly five9Service: Five9Service,
@@ -26,15 +27,25 @@ export class WebhookController {
   @Post('five9')
   async handleFive9DeliveryProfileEvent(@Body() request: any){
     switch (request.eventType) {
+      case 'CREATE':
+        this.logger.log("Request for Five9 agent delivered. Awaiting agent to accept chat interaction.");
+        break;
       case 'ACCEPT':
         this.logger.log(`Five9 agent ${request.payload.displayName} accepted your request.`);
         this.slackChannelId = await this.slackService.createPrivateSlackChannel(this.slackUserId); // This must return the slack channel id and be saved in memory
         break;
-      case 'CREATE':
-        this.logger.log("Request for Five9 agent delivered. Awaiting agent to accept chat interaction.");
+      case 'TYPING':
+        this.logger.log(`Agent is typing`);
+        if (!this.typingMessageTs) {
+          this.typingMessageTs = await this.slackService.showTypingIndicator(this.slackChannelId);
+        }
         break;
       case 'MESSAGE':
         this.logger.log("Message notification triggered.");
+        if (this.typingMessageTs) {
+          await this.slackService.clearTypingIndicator(this.slackChannelId, this.typingMessageTs);
+          this.typingMessageTs = undefined;
+        }
         this.slackService.sendMessage(this.slackChannelId, request.payload.text, request.payload.displayName); // Route message to slack channel, pass agent's name
         break;
       case 'TERMINATE':

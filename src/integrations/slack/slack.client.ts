@@ -99,4 +99,58 @@ export class SlackClient {
                 this.logger.warn(`Failed to route message to channel ${channelId}`);
             }
         }
+
+        // Slack has no typing-indicator API for modern (granular-scope) apps; that only
+        // existed on the deprecated RTM API. Simulate it by posting a placeholder message
+        // and deleting it once the real message arrives (see clearTypingIndicator).
+        async sendTypingIndicator(channelId: string): Promise<string | undefined> {
+            const body = {
+                "channel": channelId,
+                "text": "_Agent is typing..._",
+            }
+
+            try {
+                const response = await fetch(`${this.baseUrl}/chat.postMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.configService.get<string>('SLACK_BOT_TOKEN')}`,
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(body)
+                })
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Slack Chat API returned status ${response.status}: ${JSON.stringify(data)}`);
+                }
+                this.logger.log(`Typing indicator posted to channel ${channelId}`);
+                return data.ts;
+            } catch (error) {
+                this.logger.warn(`Failed to post typing indicator to channel ${channelId}`);
+            }
+        }
+
+        async clearTypingIndicator(channelId: string, ts: string): Promise<void> {
+            const body = {
+                "channel": channelId,
+                "ts": ts,
+            }
+
+            try {
+                const response = await fetch(`${this.baseUrl}/chat.delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${this.configService.get<string>('SLACK_BOT_TOKEN')}`,
+                        'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify(body)
+                })
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(`Slack Chat API returned status ${response.status}: ${JSON.stringify(data)}`);
+                }
+                this.logger.log(`Typing indicator cleared in channel ${channelId}`);
+            } catch (error) {
+                this.logger.warn(`Failed to clear typing indicator in channel ${channelId}`);
+            }
+        }
 }
