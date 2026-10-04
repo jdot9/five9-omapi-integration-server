@@ -38,13 +38,15 @@ https://youtu.be/adDfNc2BUHo
 10. Repeat steps 3 - 8 for your second app but navigate to the other .env.sample before assigning tokens.
 (omapi-integration-server -> f9-omapi-jason2 -> .env.sample)
 
-11. Open a terminal and make sure you are in f9-omapi-jason2
+11. Add this slash command to your second app: /request-agent
 
-12. Install the Slack CLI
+12. Open a terminal and make sure you are in f9-omapi-jason2
 
-13. Run command: slack login
+13. Install the Slack CLI
 
-14. After successfully authenticating, run this command: slack run
+14. Run command: slack login
+
+15. After successfully authenticating, run this command: slack run
     -  Note: If you are presented with a list of options, select option 2 (Use all app settings values)
 
 You're now ready to connect with a Five9 Agent through Slack.
