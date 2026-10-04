@@ -1,5 +1,5 @@
 # Five9 Open Messaging API Integration Server
-This integration server is designed for Slack users to initiate chat interactions with Agents through Five9's Open Messaging API.
+This integration server is designed for Slack users to initiate chat interactions with Virtual Contact Center Agents through Five9's Open Messaging API.
 Before proceeding with setting up this app, please make sure you have Docker installed, a workspace in Slack, and have completed the prerequisites required for using Five9's Open Messaging API.
 
 ## Demonstration
@@ -49,7 +49,7 @@ https://youtu.be/adDfNc2BUHo
 
 15. Run command: docker run -p 3000:3000 --env-file .env --name app f9-omapi-backend
 
-You're now ready to connect with an Agent through Slack.
+You're now ready to connect with a virtual contact center Agent through Slack.
 
 Go to a slack channel in your workspace and enter the command below: 
 
