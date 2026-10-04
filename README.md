@@ -49,7 +49,7 @@ https://youtu.be/adDfNc2BUHo
 
 15. Run command: docker run -p 3000:3000 --env-file .env --name app f9-omapi-backend
 
-You're now ready to connect with a Five9 Agent through Slack.
+You're now ready to connect with an Agent through Slack.
 
 Go to a slack channel in your workspace and enter the command below: 
 
