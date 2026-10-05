@@ -3,7 +3,7 @@ This integration server is designed for Slack users to initiate chat interaction
 Before proceeding with setting up this app, please make sure you have Docker installed, a workspace in Slack, and have completed the prerequisites required for using Five9's Open Messaging API.
 
 ## Demonstration
-https://youtu.be/adDfNc2BUHo
+https://youtu.be/oa7cRhT6WdI
 
 ## Set Up
 
